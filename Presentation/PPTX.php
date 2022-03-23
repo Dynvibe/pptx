@@ -44,15 +44,21 @@ class PPTX
      * @var ContentType
      */
     protected $contentType;
-
+	
+	/**
+	 * @var bool
+	 */
+	protected $lookForSimilar;
+	
     /**
      * Presentation constructor.
      *
      * @throws Exception
      */
-    public function __construct(string $path)
+    public function __construct(string $path, $lookForSimilar = true)
     {
         $this->filename = $path;
+	    $this->lookForSimilar = $lookForSimilar;
 
         if (!file_exists($path)) {
             throw new FileOpenException('Unable to open the source PPTX. Path does not exist.');
@@ -144,10 +150,13 @@ class PPTX
                 $clonedResources[$originalResource->getTarget()] = $resource;
                 continue;
             }
-
-            // Check if resource already exists in the document.
-            $existingResource = $this->getContentType()->lookForSimilarFile($originalResource);
-
+	
+	        // Check if resource already exists in the document.
+	        $existingResource = null;
+	        if ($this->lookForSimilar) {
+		        $existingResource = $this->getContentType()->lookForSimilarFile($originalResource);
+	        }
+			
             if(null === $existingResource || $originalResource instanceof XmlResource) {
                 $resource = clone $originalResource;
                 $resource->setDocument($this);
