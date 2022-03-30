@@ -226,6 +226,6 @@ class XmlResource extends GenericResource
 
     public static function getUniqueID(): int
     {
-        return ++self::$lastId;
+        return (int) ++self::$lastId;
     }
 }
